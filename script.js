@@ -2,52 +2,111 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('canvas');
   const scene = document.getElementById('scene');
   
-  // Maximum rotation angles in degrees
-  const MAX_ROTATION_X = 65; // 65 degrees in each direction horizontally
-  const MAX_ROTATION_Y = 25; // 25 degrees in each direction vertically
-  
   // Current rotation values
   let rotationX = 0;
   let rotationY = 0;
   
-  // Function to update the rotation based on mouse position
-  function updateRotation(mouseX, mouseY) {
-    // Get body dimensions
-    const bodyWidth = document.body.clientWidth;
-    const bodyHeight = document.body.clientHeight;
-    
-    // Calculate the center of the body
-    const centerX = bodyWidth / 2;
-    const centerY = bodyHeight / 2;
-    
-    // Calculate distance from center as a percentage of body dimensions
-    const distanceX = (mouseX - centerX) / (bodyWidth / 2);
-    const distanceY = (mouseY - centerY) / (bodyHeight / 2);
-    
-    // Calculate rotation (clamped to max values)
-    rotationX = Math.max(-MAX_ROTATION_X, Math.min(MAX_ROTATION_X, distanceX * MAX_ROTATION_X));
-    rotationY = Math.max(-MAX_ROTATION_Y, Math.min(MAX_ROTATION_Y, -distanceY * MAX_ROTATION_Y)); // Inverted Y axis
-    
-    // Apply rotation (note: X is horizontal rotation around Y axis, and Y is vertical rotation around X axis)
+  // For tracking mouse/touch movement
+  let isDragging = false;
+  let previousMouseX = 0;
+  let previousMouseY = 0;
+  
+  // Sensitivity factor for rotation (adjust as needed)
+  const ROTATION_SENSITIVITY = 0.5;
+  
+  // Function to update the model rotation
+  function updateModelRotation() {
     canvas.style.transform = `rotateX(${rotationY}deg) rotateY(${rotationX}deg)`;
   }
   
-  // Handle cursor movement over the entire document for full rotation capability
-  document.addEventListener('mousemove', (event) => {
-    // Always update rotation regardless of cursor position
-    updateRotation(event.clientX, event.clientY);
-  });
-  
-  // Handle touchmove for mobile devices
-  document.addEventListener('touchmove', (event) => {
-    if (event.touches.length > 0) {
-      const touch = event.touches[0];
-      updateRotation(touch.clientX, touch.clientY);
+  // Start dragging
+  function handleDragStart(x, y) {
+    isDragging = true;
+    previousMouseX = x;
+    previousMouseY = y;
+    
+    // Add event listeners for move and end events
+    if (window.PointerEvent) {
+      document.addEventListener('pointermove', handleDragMove);
+      document.addEventListener('pointerup', handleDragEnd);
+    } else {
+      document.addEventListener('mousemove', handleDragMove);
+      document.addEventListener('mouseup', handleDragEnd);
+      document.addEventListener('touchmove', handleDragMove);
+      document.addEventListener('touchend', handleDragEnd);
     }
-  }, { passive: false });
+  }
   
-  // Prevent default touch behavior on the body to avoid scrolling while rotating
-  document.body.addEventListener('touchmove', (event) => {
-    event.preventDefault();
-  }, { passive: false });
+  // During dragging
+  function handleDragMove(event) {
+    if (!isDragging) return;
+    
+    let currentX, currentY;
+    
+    // Get current pointer/touch coordinates
+    if (event.type === 'touchmove') {
+      event.preventDefault();
+      currentX = event.touches[0].clientX;
+      currentY = event.touches[0].clientY;
+    } else {
+      currentX = event.clientX;
+      currentY = event.clientY;
+    }
+    
+    // Calculate the movement delta
+    const deltaX = currentX - previousMouseX;
+    const deltaY = currentY - previousMouseY;
+    
+    // Update rotation (note that horizontal movement affects Y-axis rotation and vice versa)
+    rotationX += deltaX * ROTATION_SENSITIVITY;
+    rotationY -= deltaY * ROTATION_SENSITIVITY;
+    
+    // No limit on rotation - this allows continuous rotation in any direction
+    
+    // Update the model's rotation
+    updateModelRotation();
+    
+    // Save current position for next move event
+    previousMouseX = currentX;
+    previousMouseY = currentY;
+  }
+  
+  // End dragging
+  function handleDragEnd() {
+    isDragging = false;
+    
+    // Remove event listeners
+    if (window.PointerEvent) {
+      document.removeEventListener('pointermove', handleDragMove);
+      document.removeEventListener('pointerup', handleDragEnd);
+    } else {
+      document.removeEventListener('mousemove', handleDragMove);
+      document.removeEventListener('mouseup', handleDragEnd);
+      document.removeEventListener('touchmove', handleDragMove);
+      document.removeEventListener('touchend', handleDragEnd);
+    }
+  }
+  
+  // Set up event listeners for drag start on the entire document
+  if (window.PointerEvent) {
+    // Modern browsers with pointer events
+    document.addEventListener('pointerdown', (event) => {
+      handleDragStart(event.clientX, event.clientY);
+    });
+  } else {
+    // Fallback for older browsers
+    document.addEventListener('mousedown', (event) => {
+      handleDragStart(event.clientX, event.clientY);
+    });
+    
+    document.addEventListener('touchstart', (event) => {
+      if (event.touches.length > 0) {
+        event.preventDefault();
+        handleDragStart(event.touches[0].clientX, event.touches[0].clientY);
+      }
+    });
+  }
+  
+  // Initial render of the model
+  updateModelRotation();
 });
