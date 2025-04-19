@@ -58,11 +58,11 @@ body {
   height: var(--_canvas-height);
   perspective: var(--scene-perspective, 500px);
   user-select: none;
-  cursor: grab; /* Default cursor to indicate draggable */
+  cursor: grab;
 }
 
 .scene:active {
-  cursor: grabbing; /* Change cursor when actively dragging */
+  cursor: grabbing;
 }
 
 /* Canvas */
@@ -202,7 +202,7 @@ body {
 
 /* Avatar */
 
-/* Avatar Hair */
+/* Avatar: Hair */
 
 .avatar__hair {
   --c: var(--color-hair);
@@ -235,7 +235,7 @@ body {
   --z: 3;
 }
 
-/* Avatar Face */
+/* Avatar: Face */
 
 .avatar__face {
   --c: var(--color-skin);
@@ -277,7 +277,7 @@ body {
   --z: 3;
 }
 
-/* Avatar Arm */
+/* Avatar: Arm */
 
 .avatar__arm {
   --w: 1;
@@ -296,7 +296,7 @@ body {
   --x: 0;
 }
 
-/* Avatar T-shirt */
+/* Avatar: T-shirt */
 
 .avatar__tshirt {
   --c: var(--color-tshirt);
@@ -329,7 +329,7 @@ body {
   --z: 2;
 }
 
-/* Avatar Trousers */
+/* Avatar: Trousers */
 
 .avatar__trousers {
   --c: var(--color-trousers);
@@ -361,7 +361,7 @@ body {
   --x: 1;
 }
 
-/* Avatar Sneakers */
+/* Avatar: Sneakers */
 
 .avatar__sneakers {
   --w: 2;
