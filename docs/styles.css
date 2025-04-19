@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light dark;
+
   /* Layout */
   --base-unit: 1rem;
   --scene-perspective: 32rem;
@@ -9,14 +11,21 @@
   --canvas-depth: 5;
 
   /* Colors */
-  --color-bg: #121212;
-  --color-canvas: #fff;
+  --color-bg: #fff;
+  --color-fg: #000;
+  --color-canvas: #000;
   --color-hair: #5c2f13;
   --color-tshirt: #0e1d32;
   --color-trousers: #1e3f98;
   --color-sneakers-top: #998f7b;
   --color-sneakers-bottom: #fff;
   --color-skin: #d6b098;
+
+  @media (prefers-color-scheme: dark) {
+    --color-bg: #000;
+    --color-fg: #fff;
+    --color-canvas: #fff;
+  }
 }
 
 /* Global */
@@ -30,12 +39,22 @@
 html,
 body {
   height: 100dvh;
+  overscroll-behavior: none;
+  touch-action: none;
+  overflow: hidden;
+}
+
+html {
+  font-size: 100%;
 }
 
 body {
   margin: 0;
   background-color: var(--color-bg);
+  color: var(--color-fg);
   font-family: sans-serif;
+  font-family: monospace;
+  font-size: 1rem;
 }
 
 /* Root */
@@ -198,6 +217,22 @@ body {
 
 .rect__face--bottom {
   transform: rotateX(-90deg) translateZ(calc(var(--_h) * 0.5));
+}
+
+/* GitHub Link */
+
+.github-link {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: currentColor;
+  text-decoration: none;
+  font-size: 0.875rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 /* Avatar */
